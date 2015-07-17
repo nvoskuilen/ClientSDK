@@ -7,8 +7,8 @@ namespace ExactOnline.Client.OAuth
     {
         private static AuthorizationServerDescription _serverDescription;
 
-        
-        public static void Authorize(UserAuthorization authorization, string website, string clientId, string username, string password,  string clientSecret, Uri redirectUri)
+
+        public static void Authorize(UserAuthorization authorization, string website, string clientId, string clientSecret, string username, string password, Uri redirectUri)
         {
 
             if (_serverDescription == null)
