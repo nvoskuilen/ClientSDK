@@ -6,9 +6,22 @@ namespace ExactOnline.Client.OAuth
 {
     public class OAuthClient : UserAgentClient
     {
+        private readonly bool _isAutoLogin;
+        private readonly string _username;
+        private readonly string _password;
         private readonly Uri _redirectUri;
 
         #region Constructor
+
+        public OAuthClient(AuthorizationServerDescription serverDescription, string clientId, string clientSecret, string username, string password, Uri redirectUri)
+            : base(serverDescription, clientId, clientSecret)
+        {
+            _isAutoLogin = true;
+            _username = username;
+            _password = password;
+            _redirectUri = redirectUri;
+            ClientCredentialApplicator = ClientCredentialApplicator.PostParameter(clientSecret);
+        }
 
         public OAuthClient(AuthorizationServerDescription serverDescription, string clientId, string clientSecret, Uri redirectUri)
             : base(serverDescription, clientId, clientSecret)
@@ -47,11 +60,23 @@ namespace ExactOnline.Client.OAuth
 
             if (authorization.AccessToken == null || refreshFailed)
             {
-                using (var loginDialog = new LoginForm(_redirectUri))
+                if (_isAutoLogin)
                 {
-                    loginDialog.AuthorizationUri = GetAuthorizationUri(authorization);
-                    loginDialog.ShowDialog();
-                    ProcessUserAuthorization(loginDialog.AuthorizationUri, authorization);
+                    using (var loginDialog = new LoginForm(_username, _password, _redirectUri))
+                    {
+                        loginDialog.AuthorizationUri = GetAuthorizationUri(authorization);
+                        loginDialog.ShowDialog();
+                        ProcessUserAuthorization(loginDialog.AuthorizationUri, authorization);
+                    }
+                }
+                else
+                {
+                    using (var loginDialog = new LoginForm(_redirectUri))
+                    {
+                        loginDialog.AuthorizationUri = GetAuthorizationUri(authorization);
+                        loginDialog.ShowDialog();
+                        ProcessUserAuthorization(loginDialog.AuthorizationUri, authorization);
+                    }
                 }
             }
         }
