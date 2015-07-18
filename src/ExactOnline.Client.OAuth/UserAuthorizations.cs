@@ -7,10 +7,13 @@ namespace ExactOnline.Client.OAuth
     {
         private static AuthorizationServerDescription _serverDescription;
 
+        public static void Authorize(UserAuthorization authorization, string website, string clientId, string clientSecret, Uri redirectUri)
+        {
+            Authorize(authorization, website, clientId, clientSecret, null, null, redirectUri);
+        }
 
         public static void Authorize(UserAuthorization authorization, string website, string clientId, string clientSecret, string username, string password, Uri redirectUri)
         {
-
             if (_serverDescription == null)
             {
                 _serverDescription = new AuthorizationServerDescription
@@ -20,15 +23,8 @@ namespace ExactOnline.Client.OAuth
                 };
             }
 
-            OAuthClient oAuthClient;
-            if (string.IsNullOrWhiteSpace(username) && string.IsNullOrWhiteSpace(password))
-            {
-                oAuthClient = new OAuthClient(_serverDescription, clientId, clientSecret, redirectUri);
-            }
-            else
-            {
-                oAuthClient = new OAuthClient(_serverDescription, clientId, clientSecret, username, password, redirectUri);
-            }
+            var oAuthClient = new OAuthClient(_serverDescription, clientId, clientSecret, username, password, redirectUri);
+
             var authorizationState = authorization.AuthorizationState;
             oAuthClient.Authorize(ref authorizationState, authorization.RefreshToken);
             authorization.AuthorizationState = authorizationState;
