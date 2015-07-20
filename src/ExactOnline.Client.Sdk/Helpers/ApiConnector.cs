@@ -183,8 +183,8 @@ namespace ExactOnline.Client.Sdk.Helpers
 			var responseValue = string.Empty;
 
 			// Get response. If this fails: Throw the correct Exception (for testability)
-			try
-			{
+            //try
+            //{
 				WebResponse response = request.GetResponse();
 				using (Stream responseStream = response.GetResponseStream())
 				{
@@ -194,36 +194,36 @@ namespace ExactOnline.Client.Sdk.Helpers
 						responseValue = reader.ReadToEnd();
 					}
 				}
-			}
-            catch (WebException ex)
-			{
-				var statusCode = (((HttpWebResponse)ex.Response).StatusCode);
+            //}
+            //catch (WebException ex)
+            //{
+            //    var statusCode = (((HttpWebResponse)ex.Response).StatusCode);
 
-				Debug.WriteLine(ex.Message);
+            //    Debug.WriteLine(ex.Message);
 
-				switch (statusCode)
-				{
-					case HttpStatusCode.BadRequest:
-                        throw new BadRequestException(ex.Message, ex); // 400
+            //    switch (statusCode)
+            //    {
+            //        case HttpStatusCode.BadRequest:
+            //            throw new BadRequestException(ex.Message, ex); // 400
 
-					case HttpStatusCode.Unauthorized: //401
-                        throw new UnauthorizedException(ex.Message, ex); // 401
+            //        case HttpStatusCode.Unauthorized: //401
+            //            throw new UnauthorizedException(ex.Message, ex); // 401
 
-					case HttpStatusCode.Forbidden:
-                        throw new ForbiddenException(ex.Message, ex); // 403
+            //        case HttpStatusCode.Forbidden:
+            //            throw new ForbiddenException(ex.Message, ex); // 403
 
-					case HttpStatusCode.NotFound:
-                        throw new NotFoundException(ex.Message, ex); // 404
+            //        case HttpStatusCode.NotFound:
+            //            throw new NotFoundException(ex.Message, ex); // 404
 
-					case HttpStatusCode.InternalServerError: // 500
-                        throw new InternalServerErrorException(GetInternalServerErrorMessage(ex), ex);
+            //        case HttpStatusCode.InternalServerError: // 500
+            //            throw new InternalServerErrorException(GetInternalServerErrorMessage(ex), ex);
 
-					case HttpStatusCode.MethodNotAllowed: // 405
-						throw new BadRequestException(ex.Message, ex);
-				}
+            //        case HttpStatusCode.MethodNotAllowed: // 405
+            //            throw new BadRequestException(ex.Message, ex);
+            //    }
 
-				throw;
-			}
+            //    throw;
+            //}
 
 			Debug.WriteLine(responseValue);
 
