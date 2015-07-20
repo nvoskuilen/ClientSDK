@@ -16,10 +16,10 @@ namespace ExactOnline.Client.OAuth
                 httpClient.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "DotNetOpenAuth.Core/4.3.4.13329");
 
                 // Touch ExactOnline
-                var getTokens = await httpClient.GetStringAsync(uri).ConfigureAwait(false);
+                var responseContent = await httpClient.GetStringAsync(uri).ConfigureAwait(false);
 
                 // Extract the tokens from the response, and add the login credentials
-                var tokens = await ParseTokensAsync(getTokens).ConfigureAwait(false);
+                var tokens = await ParseTokensAsync(responseContent).ConfigureAwait(false);
                 tokens.Add("UserNameField", username);
                 tokens.Add("PasswordField", password);
                 tokens.Add("LoginButton", "Login");
@@ -48,6 +48,7 @@ namespace ExactOnline.Client.OAuth
 
             const string s1 = "<input type=\"hidden\"";
             const string s2 = "\"";
+            const StringComparison stringComparer = StringComparison.OrdinalIgnoreCase;
 
             using (var stringReader = new StringReader(responseContent))
             {
@@ -60,18 +61,15 @@ namespace ExactOnline.Client.OAuth
                         continue;
                     }
 
-                    await Task.Run(() =>
-                    {
-                        const string idP1 = "id=\"";
-                        var idP2 = content.Substring(content.IndexOf(idP1, StringComparison.OrdinalIgnoreCase) + idP1.Length);
-                        var id = idP2.Substring(0, idP2.IndexOf(s2, StringComparison.OrdinalIgnoreCase));
+                    const string idP1 = "id=\"";
+                    var idP2 = content.Substring(content.IndexOf(idP1, stringComparer) + idP1.Length);
+                    var id = idP2.Substring(0, idP2.IndexOf(s2, stringComparer));
 
-                        const string valueP1 = "value=\"";
-                        var valueP2 = content.Substring(content.IndexOf(valueP1, StringComparison.OrdinalIgnoreCase) + valueP1.Length);
-                        var value = valueP2.Substring(0, valueP2.IndexOf(s2, StringComparison.OrdinalIgnoreCase));
+                    const string valueP1 = "value=\"";
+                    var valueP2 = content.Substring(content.IndexOf(valueP1, stringComparer) + valueP1.Length);
+                    var value = valueP2.Substring(0, valueP2.IndexOf(s2, stringComparer));
 
-                        dict.Add(id, value);
-                    }).ConfigureAwait(false);
+                    dict.Add(id, value);
                 }
             }
 
